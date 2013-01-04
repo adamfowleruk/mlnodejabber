@@ -20,6 +20,7 @@ The below is for a default install of MarkLogic. Alter the settings as required.
 Current feature set:
  - DONE help, login commands
  - STARTED search <query> command
+ - DONE support for multiple 'voices' (or locales) - voice command
  
 Future versions
  - list -> All named alerts you are subscribed to
