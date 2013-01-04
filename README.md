@@ -1,6 +1,6 @@
 This Node.js server uses the MLDB API to provide instant messaging client access to a MarkLogic 6 REST API server.
 
-== Installation
+##Installation
 
 1. `npm install mldb`
 2. git clone this repository
@@ -8,14 +8,14 @@ This Node.js server uses the MLDB API to provide instant messaging client access
 4. Open a jabber client (E.g. Adium, Google Talk) and add your bot's jabber id as a friend. It will automatically allow your friendship request.
 5. Send the bot a message and follow it's instructions!
 
-== Usage
+##Usage
 
 The below is for a default install of MarkLogic. Alter the settings as required.
 
 1. login username:admin password:admin database:Documents
 2. search <query-string>
 
-== Features
+##Features
 
 Current feature set:
  - DONE help, login commands
@@ -29,6 +29,6 @@ Future versions
  - set key:value key2:value2 -> set parameters for future requests. E.g. focused collection, document base uri (See file upload)
  - File upload
  
-== Further information
+##Further information
 
 Email me at adam DOT fowler AT marklogic.com or add an Issue on GitHub.
