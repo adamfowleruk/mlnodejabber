@@ -50,6 +50,10 @@ var vocabulary = {
     "british": "Your current voice is: '%s'\nAvailable voices: %s", 
     "tally-ho": "You old fellow: %s\nOther chaps: %s", 
     "fake-american": "Representing: %s\nOther fools: %s"},
+  'command-noimpl': {
+    "british": "Command is not yet implemented: '%s'", 
+    "tally-ho": "Sorry old boy: '%s' is not yet implemented", 
+    "fake-american": "Ain't no '%s' here"}
 };
 
 // SETUP - ONLY MODIFY THESE
@@ -203,6 +207,11 @@ var printList = function(arr) {
 
 // SET UP CLIENT JABBER SERVER
 
+var noImpl = function(to,command) {
+  cl.send(new xmpp.Element('message', { to: to, type: 'message' }).
+    c('body').t(u.format(say("command-noimpl",to),command ))
+  );
+};
 
 
 var xmpp = require("node-xmpp");
@@ -291,11 +300,11 @@ cl.on('stanza',function(stanza) {
         c('body').t(say("helptext",from)) // TODO verify type is correct
       );
     } else if ("list"== command.command) {
-      
+      noImpl(from,'list');
     } else if ("subscribe" == command.command) {
-      
+      noImpl(from,'subscribe');
     } else if ("unsubscribe" == command.command) {
-      
+      noImpl(from,'unsubscribe');
     } else if ("login" == command.command) {
       clientInfo.login(command.username,command.password,command.database);
       cl.send(new xmpp.Element('message', { to: stanza.attrs.from, type: 'message' }).
@@ -328,9 +337,10 @@ cl.on('stanza',function(stanza) {
         );
       });
     } else if ("since" == command.command) {
-      
+      noImpl(from,'since');
     } else if ("set" == command.command) {
       // set parameter(s). E.g. default doc collection for search/upload. If blank, show all current settings.
+      noImpl(from,'set');
     } else if ("voice" == command.command) {
       // see if text is specified
       if (command.text && command.text.trim().length > 0) {
