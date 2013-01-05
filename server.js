@@ -124,10 +124,10 @@ server.listen(8081, function() {
 // UTILITY OBJECTS AND METHODS
 
 var Client = function(jid) {
+  this.voice = defaultVocab;
   this.jabberid = jid;
 };
 Client.prototype.login = function(username,password,database) {
-  this.voice = defaultVocab;
   this.username = username;
   this.password = password;
   this.database = database;
@@ -182,7 +182,10 @@ var parseCommand = function(str) {
   return result;
 };
 var say = function(message,jidto) {
-  return vocabulary[message][getClientInfo(jidto).voice];
+  var ci = getClientInfo(jidto);
+  var result = vocabulary[message][ci.voice];
+  //console.log("Say DEBUG: jidto: " + jidto, ", message: " + message + ", voice: " + ci.voice + ", saying: " + result);
+  return result;
 };
 var printList = function(arr) {
   var text = "";
@@ -221,6 +224,8 @@ cl.on('online',function() {
   setInterval(function() {
     cl.send(' ');
   }, 30000);
+  
+  return true;
 });  
 cl.on("presence",function(stanza) {
   console.log("presence called");
@@ -233,6 +238,7 @@ cl.on("presence",function(stanza) {
 });
 cl.on('stanza',function(stanza) {
   var from = stanza.attrs.from;
+  var clientInfo = getClientInfo(from);
   console.log("Stanza received " );
   if (stanza.is('presence') && stanza.attrs.type !== 'error') {
     console.log("presence message");
@@ -246,12 +252,14 @@ cl.on('stanza',function(stanza) {
         c('body').t(say("new-buddy",from)) 
       );
     } else if ("unavailable" == stanza.attrs.type) {
-      // force our availability
-      console.log("Received unavailable message");
-      // TODO only respond to those originating from our own JID
-      cl.send(new xmpp.Element('presence', { type: 'available'  }).
-        c('show').t('chat')
-      );
+      console.log("client id: " + clientInfo.jabberid);
+      if (from == (clientInfo.jabberid + "/bot")) {
+        // force our availability
+        console.log("Received unavailable message from myself");
+        // TODO only respond to those originating from our own JID
+        cl.send(new xmpp.Element('presence', { type: 'available' ,to: from, from:from })
+        );
+      }
     }
     return true;
       
@@ -265,7 +273,6 @@ cl.on('stanza',function(stanza) {
     //delete stanza.attrs.from;
     
     // fetch or create client info
-    var clientInfo = getClientInfo(stanza.attrs.from);
     
     var body = stanza.getChild('body');
     // message without body is probably a topic change
@@ -349,12 +356,14 @@ cl.on('stanza',function(stanza) {
       }
     } else {
       // unknown
-      cl.send(new xmpp.Element('message', { to: stanza.attrs.from, type: 'message' }).
-        c('body').t(u.format(say("invalid-command",from),command.command )) // TODO verify type is correct
+      console.log("Unknown command: " + message);
+      cl.send(new xmpp.Element('message', { to: from, type: 'message' }).
+        c('body').t(u.format(say("invalid-command",from),message ))
       );
     }
     // done
   }
+  return true;
 });
 cl.on('error',function(e) {
   console.log("Error occurred");
